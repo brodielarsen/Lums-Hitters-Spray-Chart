@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Lums Scout">
+<meta name="apple-mobile-web-app-title" content="Lums Dugout">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0e1726">
-<title>CDA Lumbermen — Opponent Spray Chart</title>
+<title>CDA Lumbermen — Dugout</title>
 <style>
   :root{
     --bg:#0e1726; --panel:#16243a; --panel-2:#1d2f49; --line:#2c425f;
@@ -22,504 +22,885 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--body);}
-  body{background:radial-gradient(1200px 500px at 50% -10%, #1b2c46 0%, rgba(27,44,70,0) 60%), repeating-linear-gradient(115deg, rgba(255,255,255,0.012) 0 2px, rgba(0,0,0,0) 2px 24px), var(--bg);min-height:100vh;min-height:100dvh;}
-  .wrap{max-width:560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));}
+  body{
+    background:
+      radial-gradient(1200px 500px at 50% -10%, #1b2c46 0%, rgba(27,44,70,0) 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.012) 0 2px, rgba(0,0,0,0) 2px 24px),
+      var(--bg);
+    min-height:100vh; min-height:100dvh;
+  }
+  button,input,textarea,select{font-family:inherit;color:inherit;}
+  .wrap{
+    max-width:560px;margin:0 auto;
+    padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));
+  }
 
+  /* shared chrome */
   header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px;}
   .ttl{font-family:var(--disp);font-weight:800;font-size:27px;line-height:0.95;letter-spacing:0.4px;text-transform:uppercase;}
   .ttl span{color:var(--clay);}
   .sub{font-family:var(--disp);font-weight:600;color:var(--mute);font-size:13px;letter-spacing:1.2px;text-transform:uppercase;text-align:right;}
-  .gameline{display:flex;gap:8px;margin:6px 0 12px;}
-  .gameline input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);font-family:var(--body);font-size:15px;border-radius:9px;padding:10px 11px;min-width:0;}
+  .gameline{display:flex;gap:8px;margin:6px 0 10px;}
+  .gameline input{flex:1;background:var(--panel);border:1px solid var(--line);font-size:15px;border-radius:9px;padding:10px 11px;min-width:0;}
   .gameline input::placeholder{color:var(--mute);}
+  .label{font-family:var(--disp);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--mute);font-size:12px;margin:0 2px 7px;}
 
-  .labelrow{display:flex;justify-content:space-between;align-items:center;margin:0 2px 7px;}
-  .label{font-family:var(--disp);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--mute);font-size:12px;}
-  .minibtn{background:transparent;border:1px solid var(--line);color:#cfe0f7;font-family:var(--disp);font-weight:600;letter-spacing:.6px;text-transform:uppercase;font-size:12px;border-radius:8px;padding:6px 11px;cursor:pointer;}
-  .minibtn.on{border-color:var(--green);color:var(--hit);}
+  /* toolbar */
+  .toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .toolbar button{flex:1;min-width:96px;background:transparent;border:1.5px solid var(--steel);color:#cfe0f7;border-radius:11px;padding:11px 8px;font-family:var(--disp);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:13px;cursor:pointer;}
+  .toolbar button:active{transform:translateY(1px);}
+  .toolbar .wake.on{border-color:var(--green);color:var(--hit);}
+  .toolbar .pdf{border-color:var(--blue);color:#cfe0f7;}
+  .toolbar .danger{border-color:var(--red);color:#ff8a6c;}
 
-  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
-  .chip{flex:0 0 auto;background:var(--panel);border:1.5px solid var(--line);color:var(--ink);font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:0.3px;padding:8px 12px;border-radius:11px;cursor:pointer;transition:transform .05s,border-color .15s,background .15s;white-space:nowrap;text-align:left;line-height:1.15;}
-  .chip:active{transform:scale(.96);}
-  .chip.active{background:linear-gradient(180deg,#27466f,#1d3354);border-color:var(--clay);box-shadow:0 0 0 1px var(--clay) inset;}
-  .chip .ord{color:var(--mute);font-size:12px;font-weight:600;}
-  .chip.active .ord{color:#ffd36b;}
-  .chip .ln{color:var(--mute);font-size:12px;font-weight:600;}
-  .chip.add{color:var(--mute);border-style:dashed;align-self:center;}
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:5px;}
+  .tabs button{flex:1;border:none;background:transparent;border-radius:9px;padding:12px 6px;font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);cursor:pointer;}
+  .tabs button.active{background:var(--clay);color:#fff;}
 
-  /* current batter card */
-  .batter{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:4px 0 12px;}
-  .batter .nm{font-family:var(--disp);font-weight:800;font-size:21px;text-transform:uppercase;letter-spacing:.4px;}
-  .batter .nm em{color:var(--mute);font-style:normal;font-size:14px;font-weight:600;}
-  .batter .ln{float:right;font-family:var(--disp);font-weight:800;font-size:21px;color:#ffd36b;font-variant-numeric:tabular-nums;}
-  .reschips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
-  .rc{font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.3px;padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:#101d31;cursor:pointer;}
-  .rc.hit{color:var(--hit);border-color:#2f6b46;}
-  .rc.out{color:var(--out);border-color:#7a3422;}
-  .rc.reach{color:var(--reach);border-color:#7a5b16;}
-  .rc.none{color:#cfe0f7;}
-  .rc.empty{color:var(--mute);border-style:dashed;cursor:default;}
-  .tend{color:var(--mute);font-size:12px;margin-top:8px;font-family:var(--body);}
+  .view{display:none;}
+  .view.active{display:block;}
 
-  /* field */
-  .fieldwrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;}
-  svg.field{display:block;width:100%;height:auto;touch-action:manipulation;border-radius:8px;cursor:crosshair;}
-  .legend{display:flex;flex-wrap:wrap;gap:12px 16px;justify-content:center;margin-top:6px;color:var(--mute);font-size:11.5px;font-family:var(--body);}
-  .legend .it{display:flex;align-items:center;gap:5px;}
-  .sw{width:13px;height:13px;display:inline-block;}
-  .hint{text-align:center;color:var(--mute);font-size:12px;margin:2px 0 12px;font-family:var(--body);}
-  .hint b{color:#cfe0f7;}
+  /* responsive two-column fill in landscape / wide */
+  .cols{display:flex;flex-direction:column;gap:0;}
+  .lineup-top{margin-bottom:4px;}
+  @media (orientation:landscape),(min-width:820px){
+    .wrap{max-width:100%;}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+    .cols > .col > *:first-child{margin-top:0;}
+  }
+  @media (min-width:1200px){ .wrap{max-width:1180px;} }
 
-  /* entry */
-  .grp{margin-bottom:10px;}
-  .grp .gl{font-family:var(--disp);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);font-size:11px;margin:0 2px 6px;}
-  .selrow{display:grid;gap:8px;}
-  .c4{grid-template-columns:repeat(4,1fr);}
-  .c5{grid-template-columns:repeat(5,1fr);}
-  .sb{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--disp);font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:16px;padding:13px 4px;border-radius:11px;cursor:pointer;transition:transform .04s,border-color .12s,background .12s;touch-action:manipulation;}
-  .sb:active{transform:scale(.96);}
-  .sb.sel{background:linear-gradient(180deg,#27466f,#1d3354);border-color:var(--clay);box-shadow:0 0 0 1px var(--clay) inset;color:#fff;}
-  .sb.hitc.sel{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset;}
-  .sb small{display:block;font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:0;opacity:.8;margin-top:3px;text-transform:none;}
-
-  .notate{display:flex;gap:8px;align-items:center;margin:4px 0 10px;}
-  .notate input{flex:1;background:#0b1320;border:1.5px solid var(--line);color:#fff;font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:1px;border-radius:11px;padding:11px 13px;min-width:0;text-transform:uppercase;}
-  .notate input::placeholder{color:var(--mute);font-weight:600;letter-spacing:.5px;}
-
-  .actions{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
-  .btn{border:none;border-radius:14px;color:#fff;font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;padding:18px 8px;font-size:22px;line-height:1;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 8px 18px rgba(0,0,0,.28);transition:transform .04s, box-shadow .04s;touch-action:manipulation;}
-  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
-  .b-log{background:linear-gradient(180deg,var(--green),var(--green-d));}
-  .b-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink);box-shadow:none;font-size:17px;}
-  .b-ghost:active{transform:translateY(2px);background:var(--panel);box-shadow:none;}
-
-  /* lineup editor */
-  .editor{background:var(--panel);border:1px solid var(--clay);border-radius:14px;padding:12px;margin:4px 0 14px;display:none;}
-  .editor.open{display:block;}
-  .erow{display:flex;gap:7px;align-items:center;margin-bottom:8px;}
-  .erow .o{width:22px;text-align:center;font-family:var(--disp);font-weight:800;color:var(--mute);}
-  .erow input.enm{flex:1;background:#0b1320;border:1px solid var(--line);color:#fff;font-family:var(--body);font-size:15px;border-radius:8px;padding:9px 10px;min-width:0;}
-  .erow .bats{display:flex;gap:3px;}
-  .erow .bt{width:30px;text-align:center;border:1px solid var(--line);background:#0b1320;color:var(--mute);font-family:var(--disp);font-weight:700;border-radius:7px;padding:8px 0;cursor:pointer;font-size:14px;}
-  .erow .bt.on{border-color:var(--clay);color:#fff;background:#27466f;}
-  .erow .del{border:1px solid #7a3422;background:transparent;color:var(--out);border-radius:7px;width:34px;padding:8px 0;cursor:pointer;font-size:15px;}
-
-  /* summary */
-  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-  thead th{background:var(--panel-2);color:#cfe0f7;font-family:var(--disp);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px;padding:9px 6px;text-align:left;border-bottom:1px solid var(--line);}
-  thead th.c{text-align:center;width:34px;}
-  thead th.l{text-align:center;width:48px;}
-  tbody td{padding:9px 8px;font-family:var(--body);font-size:13.5px;border-bottom:1px solid var(--line);vertical-align:top;}
-  tbody td.o{font-family:var(--disp);font-weight:800;color:var(--mute);text-align:center;}
-  tbody td.l{font-family:var(--disp);font-weight:800;color:#ffd36b;text-align:center;font-variant-numeric:tabular-nums;}
-  tbody td.nm{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
-  tbody td .res{color:var(--mute);font-size:12px;margin-top:2px;}
-
-  .foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
-  .foot button{flex:1 1 30%;min-width:130px;}
-  .wake.on{border-color:var(--green)!important;color:var(--hit)!important;}
-  .savenote{text-align:center;color:var(--mute);font-size:12px;margin-top:12px;line-height:1.5;}
+  /* toast + savenote shared */
   .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--clay);color:#fff;font-family:var(--disp);font-weight:700;letter-spacing:.5px;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:50;font-size:15px;text-transform:uppercase;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .savenote{text-align:center;color:var(--mute);font-size:12px;margin-top:14px;line-height:1.5;}
+
+  /* ===================== PITCH TAB ===================== */
+  #tab-pitch .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+  #tab-pitch .chip{flex:0 0 auto;background:var(--panel);border:1.5px solid var(--line);font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:0.4px;padding:11px 16px;border-radius:11px;cursor:pointer;transition:transform .05s,border-color .15s,background .15s;text-transform:uppercase;white-space:nowrap;}
+  #tab-pitch .chip:active{transform:scale(.96);}
+  #tab-pitch .chip.active{background:linear-gradient(180deg,#27466f,#1d3354);border-color:var(--clay);box-shadow:0 0 0 1px var(--clay) inset;}
+  #tab-pitch .chip.add{color:var(--mute);border-style:dashed;}
+  #tab-pitch .scoreboard{background:linear-gradient(180deg,#0b1320,#101d31);border:1px solid var(--line);border-radius:16px;padding:14px 16px 16px;margin:6px 0 14px;box-shadow:0 10px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);text-align:center;}
+  #tab-pitch .sb-top{display:flex;justify-content:space-between;align-items:center;color:var(--mute);font-family:var(--disp);font-weight:600;letter-spacing:1px;font-size:13px;text-transform:uppercase;}
+  #tab-pitch .sb-pitcher{color:var(--ink);font-size:20px;font-weight:800;}
+  #tab-pitch .count{display:flex;justify-content:center;align-items:baseline;gap:6px;margin:6px 0 2px;font-family:var(--disp);font-weight:800;}
+  #tab-pitch .count .n{font-size:88px;line-height:0.9;letter-spacing:-2px;font-variant-numeric:tabular-nums;text-shadow:0 2px 0 rgba(0,0,0,.35);}
+  #tab-pitch .count .dash{font-size:56px;color:var(--mute);transform:translateY(-8px);}
+  #tab-pitch .count .balls{color:#ffd36b;} #tab-pitch .count .strikes{color:#7fe0a6;}
+  #tab-pitch .cl{display:flex;justify-content:center;gap:64px;color:var(--mute);font-family:var(--disp);font-weight:700;letter-spacing:2px;font-size:13px;text-transform:uppercase;margin-top:-2px;}
+  #tab-pitch .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  #tab-pitch .btn{border:none;border-radius:14px;color:#fff;font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:0.8px;cursor:pointer;padding:24px 8px;font-size:27px;line-height:1;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 8px 18px rgba(0,0,0,.28);transition:transform .04s, box-shadow .04s;user-select:none;touch-action:manipulation;}
+  #tab-pitch .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  #tab-pitch .btn small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:0.3px;opacity:.82;margin-top:5px;text-transform:none;}
+  #tab-pitch .b-strike{background:linear-gradient(180deg,var(--green),var(--green-d));}
+  #tab-pitch .b-ball{background:linear-gradient(180deg,var(--red),var(--red-d));}
+  #tab-pitch .b-foul{background:linear-gradient(180deg,var(--steel),var(--steel-d));font-size:22px;padding:17px 8px;}
+  #tab-pitch .b-inplay{background:linear-gradient(180deg,var(--blue),var(--blue-d));font-size:22px;padding:17px 8px;}
+  #tab-pitch .row2{margin-top:10px;}
+  #tab-pitch .row3{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  #tab-pitch .b-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink);box-shadow:none;font-size:18px;padding:15px 8px;}
+  #tab-pitch .b-ghost:active{transform:translateY(2px);background:var(--panel);box-shadow:none;}
+  #tab-pitch .b-undo{border-color:var(--amber);color:var(--amber);}
+  #tab-pitch .b-next{border-color:var(--steel);color:#cfe0f7;}
+  #tab-pitch .statcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:14px 0;overflow:hidden;}
+  #tab-pitch .statcard h3{margin:0;padding:11px 14px;background:var(--panel-2);font-family:var(--disp);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:15px;color:#cfe0f7;border-bottom:1px solid var(--line);}
+  #tab-pitch .grid4{display:grid;grid-template-columns:repeat(2,1fr);}
+  #tab-pitch .cell{padding:13px 14px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);}
+  #tab-pitch .cell:nth-child(2n){border-right:none;}
+  #tab-pitch .cell .k{font-family:var(--disp);font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--mute);font-size:11px;}
+  #tab-pitch .cell .v{font-family:var(--disp);font-weight:800;font-size:32px;line-height:1;margin-top:3px;font-variant-numeric:tabular-nums;}
+  #tab-pitch .cell .tg{font-size:11px;color:var(--mute);font-family:var(--body);margin-top:3px;}
+  #tab-pitch .good{color:#56d98c;} #tab-pitch .warn{color:var(--amber);} #tab-pitch .bad{color:#ff7a5c;} #tab-pitch .neutral{color:var(--ink);}
+  #tab-pitch .howlegend{color:var(--mute);font-size:12px;line-height:1.55;margin:12px 2px 0;}
+  #tab-pitch .howlegend b{color:#cfe0f7;}
+  #tab-pitch details{margin-top:12px;}
+  #tab-pitch summary{cursor:pointer;color:var(--mute);font-family:var(--disp);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:12px;}
+
+  /* ===================== SPRAY TAB ===================== */
+  #tab-spray .labelrow{display:flex;justify-content:space-between;align-items:center;margin:0 2px 7px;}
+  #tab-spray .minibtn{background:transparent;border:1px solid var(--line);color:#cfe0f7;font-family:var(--disp);font-weight:600;letter-spacing:.6px;text-transform:uppercase;font-size:12px;border-radius:8px;padding:6px 11px;cursor:pointer;}
+  #tab-spray .minibtn.on{border-color:var(--green);color:var(--hit);}
+  #tab-spray .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+  #tab-spray .chip{flex:0 0 auto;background:var(--panel);border:1.5px solid var(--line);font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:0.3px;padding:8px 12px;border-radius:11px;cursor:pointer;transition:transform .05s,border-color .15s,background .15s;white-space:nowrap;text-align:left;line-height:1.15;}
+  #tab-spray .chip:active{transform:scale(.96);}
+  #tab-spray .chip.active{background:linear-gradient(180deg,#27466f,#1d3354);border-color:var(--clay);box-shadow:0 0 0 1px var(--clay) inset;}
+  #tab-spray .chip .ord{color:var(--mute);font-size:12px;font-weight:600;}
+  #tab-spray .chip.active .ord{color:#ffd36b;}
+  #tab-spray .chip .ln{color:var(--mute);font-size:12px;font-weight:600;}
+  #tab-spray .chip.add{color:var(--mute);border-style:dashed;align-self:center;}
+  #tab-spray .batter{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:4px 0 12px;}
+  #tab-spray .batter .nm{font-family:var(--disp);font-weight:800;font-size:21px;text-transform:uppercase;letter-spacing:.4px;}
+  #tab-spray .batter .nm em{color:var(--mute);font-style:normal;font-size:14px;font-weight:600;}
+  #tab-spray .batter .ln{float:right;font-family:var(--disp);font-weight:800;font-size:21px;color:#ffd36b;font-variant-numeric:tabular-nums;}
+  #tab-spray .reschips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  #tab-spray .rc{font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.3px;padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:#101d31;cursor:pointer;}
+  #tab-spray .rc.hit{color:var(--hit);border-color:#2f6b46;}
+  #tab-spray .rc.out{color:var(--out);border-color:#7a3422;}
+  #tab-spray .rc.reach{color:var(--reach);border-color:#7a5b16;}
+  #tab-spray .rc.none{color:#cfe0f7;}
+  #tab-spray .rc.empty{color:var(--mute);border-style:dashed;cursor:default;}
+  #tab-spray .tend{color:var(--mute);font-size:12px;margin-top:8px;font-family:var(--body);}
+  #tab-spray .fieldwrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;}
+  #tab-spray svg.field{display:block;width:100%;height:auto;touch-action:manipulation;border-radius:8px;cursor:crosshair;}
+  #tab-spray .legend{display:flex;flex-wrap:wrap;gap:12px 16px;justify-content:center;margin-top:6px;color:var(--mute);font-size:11.5px;font-family:var(--body);}
+  #tab-spray .legend .it{display:flex;align-items:center;gap:5px;}
+  #tab-spray .sw{width:13px;height:13px;display:inline-block;}
+  #tab-spray .hint{text-align:center;color:var(--mute);font-size:12px;margin:2px 0 12px;font-family:var(--body);}
+  #tab-spray .hint b{color:#cfe0f7;}
+  #tab-spray .grp{margin-bottom:10px;}
+  #tab-spray .grp .gl{font-family:var(--disp);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);font-size:11px;margin:0 2px 6px;}
+  #tab-spray .selrow{display:grid;gap:8px;}
+  #tab-spray .c4{grid-template-columns:repeat(4,1fr);}
+  #tab-spray .c5{grid-template-columns:repeat(5,1fr);}
+  #tab-spray .sb{border:1.5px solid var(--line);background:var(--panel);font-family:var(--disp);font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:16px;padding:13px 4px;border-radius:11px;cursor:pointer;transition:transform .04s,border-color .12s,background .12s;touch-action:manipulation;}
+  #tab-spray .sb:active{transform:scale(.96);}
+  #tab-spray .sb.sel{background:linear-gradient(180deg,#27466f,#1d3354);border-color:var(--clay);box-shadow:0 0 0 1px var(--clay) inset;color:#fff;}
+  #tab-spray .sb.hitc.sel{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset;}
+  #tab-spray .sb small{display:block;font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:0;opacity:.8;margin-top:3px;text-transform:none;}
+  #tab-spray .notate{display:flex;gap:8px;align-items:center;margin:4px 0 10px;}
+  #tab-spray .notate input{flex:1;background:#0b1320;border:1.5px solid var(--line);color:#fff;font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:1px;border-radius:11px;padding:11px 13px;min-width:0;text-transform:uppercase;}
+  #tab-spray .notate input::placeholder{color:var(--mute);font-weight:600;letter-spacing:.5px;}
+  #tab-spray .actions{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
+  #tab-spray .btn{border:none;border-radius:14px;color:#fff;font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;padding:18px 8px;font-size:22px;line-height:1;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 8px 18px rgba(0,0,0,.28);transition:transform .04s, box-shadow .04s;touch-action:manipulation;}
+  #tab-spray .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+  #tab-spray .b-log{background:linear-gradient(180deg,var(--green),var(--green-d));}
+  #tab-spray .b-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink);box-shadow:none;font-size:17px;}
+  #tab-spray .b-ghost:active{transform:translateY(2px);background:var(--panel);box-shadow:none;}
+  #tab-spray .editor{background:var(--panel);border:1px solid var(--clay);border-radius:14px;padding:12px;margin:4px 0 14px;display:none;}
+  #tab-spray .editor.open{display:block;}
+  #tab-spray .erow{display:flex;gap:7px;align-items:center;margin-bottom:8px;}
+  #tab-spray .erow .o{width:22px;text-align:center;font-family:var(--disp);font-weight:800;color:var(--mute);}
+  #tab-spray .erow input.enm{flex:1;background:#0b1320;border:1px solid var(--line);color:#fff;font-size:15px;border-radius:8px;padding:9px 10px;min-width:0;}
+  #tab-spray .erow .bats{display:flex;gap:3px;}
+  #tab-spray .erow .bt{width:30px;text-align:center;border:1px solid var(--line);background:#0b1320;color:var(--mute);font-family:var(--disp);font-weight:700;border-radius:7px;padding:8px 0;cursor:pointer;font-size:14px;}
+  #tab-spray .erow .bt.on{border-color:var(--clay);color:#fff;background:#27466f;}
+  #tab-spray .erow .del{border:1px solid #7a3422;background:transparent;color:var(--out);border-radius:7px;width:34px;padding:8px 0;cursor:pointer;font-size:15px;}
+
+  /* shared table (both summaries) */
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  thead th{background:var(--panel-2);color:#cfe0f7;font-family:var(--disp);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px;padding:10px 6px;text-align:center;border-bottom:1px solid var(--line);}
+  thead th:first-child{text-align:left;padding-left:13px;}
+  tbody td{padding:10px 6px;text-align:center;font-family:var(--disp);font-weight:600;font-size:17px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;}
+  tbody td:first-child{text-align:left;padding-left:13px;font-weight:700;}
+  #tab-pitch tbody td:first-child{text-transform:uppercase;letter-spacing:.5px;}
+  #tab-pitch tbody tr.team td{background:#101d31;font-weight:800;color:#ffd36b;border-top:2px solid var(--clay);}
+  #tab-pitch tbody tr.zero td{color:var(--mute);}
+  #tab-spray thead th{text-align:left;}
+  #tab-spray thead th.c{text-align:center;width:34px;}
+  #tab-spray thead th.l{text-align:center;width:48px;}
+  #tab-spray tbody td{padding:9px 8px;font-family:var(--body);font-size:13.5px;vertical-align:top;text-align:left;}
+  #tab-spray tbody td.o{font-family:var(--disp);font-weight:800;color:var(--mute);text-align:center;}
+  #tab-spray tbody td.l{font-family:var(--disp);font-weight:800;color:#ffd36b;text-align:center;font-variant-numeric:tabular-nums;}
+  #tab-spray tbody td.nm{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+  #tab-spray tbody td .res{color:var(--mute);font-size:12px;margin-top:2px;}
+
+  /* ===================== NOTES TAB ===================== */
+  #tab-notes .quickadd{display:flex;gap:8px;margin:2px 0 12px;}
+  #tab-notes .quickadd input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px 13px;font-size:16px;min-width:0;}
+  #tab-notes .quickadd input::placeholder{color:var(--mute);}
+  #tab-notes .quickadd button{background:var(--clay);border:none;border-radius:11px;padding:0 20px;font-family:var(--disp);font-weight:800;font-size:17px;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;}
+  #tab-notes .nlist{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+  #tab-notes .nentry{display:flex;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 13px;align-items:flex-start;}
+  #tab-notes .nentry .t{font-family:var(--disp);font-weight:800;color:var(--amber);font-size:14px;white-space:nowrap;padding-top:1px;font-variant-numeric:tabular-nums;}
+  #tab-notes .nentry .txt{flex:1;font-size:15px;line-height:1.45;}
+  #tab-notes .nentry .x{margin-left:auto;background:none;border:none;color:var(--mute);font-size:20px;line-height:1;padding:0 2px;cursor:pointer;}
+  #tab-notes .nempty{color:var(--mute);font-size:13px;text-align:center;padding:14px 0;}
+  #tab-notes textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;line-height:1.55;min-height:160px;resize:vertical;}
+
+  /* ===================== PRINT / PDF ===================== */
+  #report{display:none;}
+  @media print{
+    body{background:#fff;color:#111;}
+    .wrap{display:none !important;}
+    #report{display:block;color:#111;font-family:var(--body);}
+    #report h1{font-family:var(--disp);font-size:23px;text-transform:uppercase;margin:0 0 2px;}
+    #report .meta{color:#555;font-size:13px;margin-bottom:16px;}
+    #report h2{font-family:var(--disp);font-size:15px;text-transform:uppercase;border-bottom:2px solid #111;padding-bottom:3px;margin:20px 0 9px;}
+    #report table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border:none;}
+    #report th,#report td{border:1px solid #bbb;padding:5px 7px;text-align:center;}
+    #report td.l,#report th.l{text-align:left;}
+    #report .rfield{width:58%;max-width:380px;margin:4px 0 8px;}
+    #report .rfield svg{width:100%;height:auto;}
+    #report .note{border-bottom:1px solid #ddd;padding:5px 0;font-size:12.5px;}
+    #report .note b{color:#000;}
+    #report .gen{white-space:pre-wrap;font-size:12.5px;margin-top:10px;line-height:1.5;}
+    .pgbreak{page-break-before:always;}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="ttl">CDA Lumbermen<br><span>Opponent Hitters</span></div>
-    <div class="sub">Spray Chart &amp;<br>At-Bat Log</div>
+    <div class="ttl">CDA Lumbermen<br><span>Dugout</span></div>
+    <div class="sub">Pitch · Spray<br>· Notes</div>
   </header>
 
   <div class="gameline">
-    <input id="opp" type="text" placeholder="Opponent" autocomplete="off">
-    <input id="dt" type="text" placeholder="Date" autocomplete="off" style="flex:0 0 130px;">
+    <input id="g_opp" type="text" placeholder="Opponent" autocomplete="off">
+    <input id="g_dt" type="text" placeholder="Date" autocomplete="off" style="flex:0 0 130px;">
   </div>
 
-  <div class="labelrow">
-    <span class="label">Batting order — tap to select</span>
-    <button class="minibtn" id="editBtn" onclick="toggleEditor()">Edit Lineup</button>
+  <div class="toolbar">
+    <button class="wake" id="g_wake">☀ Keep Screen On</button>
+    <button class="pdf" id="g_pdf">⬇ Save / Download PDF</button>
+    <button class="danger" id="g_new">New Game</button>
   </div>
-  <div class="editor" id="editor"></div>
-  <div class="chips" id="chips"></div>
 
-  <div class="batter" id="batterCard"></div>
-
-  <div class="labelrow">
-    <span class="label">Spray chart — tap where it was hit</span>
-    <button class="minibtn" id="allBtn" onclick="toggleAll()">Show: This Hitter</button>
+  <div class="tabs">
+    <button data-tab="pitch" class="active">Pitch</button>
+    <button data-tab="spray">Spray</button>
+    <button data-tab="notes">Notes</button>
   </div>
-  <div class="fieldwrap">
-    <svg class="field" id="field" viewBox="0 0 400 360" onclick="onFieldTap(event)">
-      <path d="M200,332 L40,172 Q200,30 360,172 Z" fill="#16331f" opacity="0.55"/>
-      <path d="M40,172 Q200,30 360,172" fill="none" stroke="#5b7da0" stroke-width="2.4"/>
-      <line x1="200" y1="332" x2="40" y2="172" stroke="#cfe0f7" stroke-width="2"/>
-      <line x1="200" y1="332" x2="360" y2="172" stroke="#cfe0f7" stroke-width="2"/>
-      <path d="M142,274 Q200,228 258,274" fill="none" stroke="#7a8aa0" stroke-width="1" opacity="0.5"/>
-      <path d="M200,332 L258,274 L200,216 L142,274 Z" fill="#1d2f49" stroke="#9bb0cf" stroke-width="1.6" opacity="0.95"/>
-      <circle cx="200" cy="287" r="6" fill="#2c425f" stroke="#9bb0cf" stroke-width="1"/>
-      <rect x="195" y="327" width="10" height="10" transform="rotate(45 200 332)" fill="#eaf1fb"/>
-      <rect x="253" y="269" width="9" height="9" transform="rotate(45 258 274)" fill="#eaf1fb"/>
-      <rect x="195" y="211" width="9" height="9" transform="rotate(45 200 216)" fill="#eaf1fb"/>
-      <rect x="137" y="269" width="9" height="9" transform="rotate(45 142 274)" fill="#eaf1fb"/>
-      <g fill="#7a8aa0" font-family="sans-serif" font-size="11" opacity="0.45" text-anchor="middle">
-        <text x="200" y="300">1</text><text x="249" y="262">3</text><text x="226" y="238">4</text>
-        <text x="174" y="238">6</text><text x="151" y="262">5</text><text x="108" y="150">7</text>
-        <text x="200" y="105">8</text><text x="292" y="150">9</text>
-      </g>
-      <g id="dotLayer"></g>
-      <g id="pendLayer"></g>
-    </svg>
-    <div class="legend">
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--out)"/></svg>Out</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--hit)"/></svg>Hit</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--reach)"/></svg>Reached</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#9bb0cf"/></svg>● GB</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#9bb0cf" stroke-width="2"/></svg>○ FB</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><rect x="2.5" y="2.5" width="9" height="9" transform="rotate(45 7 7)" fill="#9bb0cf"/></svg>◆ LD</span>
-      <span class="it"><svg class="sw" viewBox="0 0 14 14"><path d="M7,1 L12,11 L2,11 Z" fill="#9bb0cf"/></svg>▲ PU</span>
+
+  <!-- ===================== PITCH ===================== -->
+  <section class="view active" id="tab-pitch">
+    <div class="cols">
+      <div class="col">
+        <div class="label">Pitcher on the mound</div>
+        <div class="chips" id="p_chips"></div>
+        <div class="scoreboard">
+          <div class="sb-top">
+            <span id="p_sbName" class="sb-pitcher">— pick a pitcher —</span>
+            <span id="p_sbAB">0 P this AB</span>
+          </div>
+          <div class="count">
+            <span class="n balls" id="p_cBalls">0</span>
+            <span class="dash">–</span>
+            <span class="n strikes" id="p_cStrikes">0</span>
+          </div>
+          <div class="cl"><span>Balls</span><span>Strikes</span></div>
+        </div>
+        <div class="btns">
+          <button class="btn b-strike" onclick="PitchApp.addPitch('strike')">Strike<small>called / swinging</small></button>
+          <button class="btn b-ball" onclick="PitchApp.addPitch('ball')">Ball<small>out of the zone</small></button>
+        </div>
+        <div class="btns row2">
+          <button class="btn b-foul" onclick="PitchApp.addPitch('foul')">Foul<small>strike, won't K the batter</small></button>
+          <button class="btn b-inplay" onclick="PitchApp.addPitch('inplay')">In Play<small>ends the at-bat</small></button>
+        </div>
+        <div class="row3">
+          <button class="btn b-ghost b-undo" onclick="PitchApp.undo()">↶ Undo</button>
+          <button class="btn b-ghost b-next" onclick="PitchApp.nextBatter()">Next Batter ›<br><small style="font-weight:500;opacity:.8;">walk / HBP / out</small></button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="statcard" style="margin-top:0;">
+          <h3 id="p_curHead">Current pitcher</h3>
+          <div class="grid4">
+            <div class="cell"><div class="k">Strike %</div><div class="v" id="p_vS">—</div><div class="tg">target 62%+</div></div>
+            <div class="cell"><div class="k">1st-Pitch Strike %</div><div class="v" id="p_vF">—</div><div class="tg">target 60%+</div></div>
+            <div class="cell"><div class="k">Pitches (S / B)</div><div class="v neutral" id="p_vP">0</div><div class="tg" id="p_vSB">0 strikes · 0 balls</div></div>
+            <div class="cell"><div class="k">Batters · K · BB</div><div class="v neutral" id="p_vBF">0</div><div class="tg" id="p_vKBB">0 K · 0 BB</div></div>
+          </div>
+        </div>
+        <div class="label">Game totals by pitcher</div>
+        <table>
+          <thead><tr><th>Pitcher</th><th>P</th><th>Strk%</th><th>FPS%</th><th>BF</th><th>K</th><th>BB</th></tr></thead>
+          <tbody id="p_tbody"></tbody>
+        </table>
+        <details>
+          <summary>How the buttons work</summary>
+          <div class="howlegend">
+            <b>Strike</b> = any called or swinging strike (advances the count; 3 = strikeout).<br>
+            <b>Ball</b> = out of the zone (4 = walk).<br>
+            <b>Foul</b> = counts as a strike thrown for Strike %, but won't strike the batter out at 2 strikes.<br>
+            <b>In Play</b> = ball put in play; counts as a strike thrown and ends the at-bat.<br>
+            <b>Next Batter</b> = end the at-bat for a walk, hit-by-pitch, or any out without logging another pitch.<br>
+            <b>Undo</b> reverses the last action. K/BB auto-tally on the 3rd strike / 4th ball.
+          </div>
+        </details>
+      </div>
     </div>
-  </div>
-  <div class="hint" id="pendHint">Pick a result below. Batted balls: tap the field first; <b>K / BB / HBP</b> don't need a location.</div>
+  </section>
 
-  <div class="grp">
-    <div class="gl">Trajectory (batted balls)</div>
-    <div class="selrow c4">
-      <button class="sb" data-traj="GB" onclick="setTraj('GB')">GB<small>grounder</small></button>
-      <button class="sb" data-traj="LD" onclick="setTraj('LD')">LD<small>liner</small></button>
-      <button class="sb" data-traj="FB" onclick="setTraj('FB')">FB<small>fly ball</small></button>
-      <button class="sb" data-traj="PU" onclick="setTraj('PU')">PU<small>pop up</small></button>
+  <!-- ===================== SPRAY ===================== -->
+  <section class="view" id="tab-spray">
+    <div class="lineup-top">
+      <div class="labelrow">
+        <span class="label" style="margin-bottom:0;">Batting order — tap to select</span>
+        <button class="minibtn" id="s_editBtn" onclick="SprayApp.toggleEditor()">Edit Lineup</button>
+      </div>
+      <div class="editor" id="s_editor"></div>
+      <div class="chips" id="s_chips"></div>
+      <div class="batter" id="s_batterCard"></div>
     </div>
-  </div>
+    <div class="cols">
+      <div class="col">
+        <div class="labelrow">
+          <span class="label" style="margin-bottom:0;">Spray chart — tap where it was hit</span>
+          <button class="minibtn" id="s_allBtn" onclick="SprayApp.toggleAll()">Show: This Hitter</button>
+        </div>
+        <div class="fieldwrap">
+          <svg class="field" id="s_field" viewBox="0 0 400 360" onclick="SprayApp.onFieldTap(event)">
+            <path d="M200,332 L40,172 Q200,30 360,172 Z" fill="#16331f" opacity="0.55"/>
+            <path d="M40,172 Q200,30 360,172" fill="none" stroke="#5b7da0" stroke-width="2.4"/>
+            <line x1="200" y1="332" x2="40" y2="172" stroke="#cfe0f7" stroke-width="2"/>
+            <line x1="200" y1="332" x2="360" y2="172" stroke="#cfe0f7" stroke-width="2"/>
+            <path d="M142,274 Q200,228 258,274" fill="none" stroke="#7a8aa0" stroke-width="1" opacity="0.5"/>
+            <path d="M200,332 L258,274 L200,216 L142,274 Z" fill="#1d2f49" stroke="#9bb0cf" stroke-width="1.6" opacity="0.95"/>
+            <circle cx="200" cy="287" r="6" fill="#2c425f" stroke="#9bb0cf" stroke-width="1"/>
+            <rect x="195" y="327" width="10" height="10" transform="rotate(45 200 332)" fill="#eaf1fb"/>
+            <rect x="253" y="269" width="9" height="9" transform="rotate(45 258 274)" fill="#eaf1fb"/>
+            <rect x="195" y="211" width="9" height="9" transform="rotate(45 200 216)" fill="#eaf1fb"/>
+            <rect x="137" y="269" width="9" height="9" transform="rotate(45 142 274)" fill="#eaf1fb"/>
+            <g fill="#7a8aa0" font-family="sans-serif" font-size="11" opacity="0.45" text-anchor="middle">
+              <text x="200" y="300">1</text><text x="249" y="262">3</text><text x="226" y="238">4</text>
+              <text x="174" y="238">6</text><text x="151" y="262">5</text><text x="108" y="150">7</text>
+              <text x="200" y="105">8</text><text x="292" y="150">9</text>
+            </g>
+            <g id="s_dotLayer"></g>
+            <g id="s_pendLayer"></g>
+          </svg>
+          <div class="legend">
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--out)"/></svg>Out</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--hit)"/></svg>Hit</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="var(--reach)"/></svg>Reached</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#9bb0cf"/></svg>● GB</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#9bb0cf" stroke-width="2"/></svg>○ FB</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><rect x="2.5" y="2.5" width="9" height="9" transform="rotate(45 7 7)" fill="#9bb0cf"/></svg>◆ LD</span>
+            <span class="it"><svg class="sw" viewBox="0 0 14 14"><path d="M7,1 L12,11 L2,11 Z" fill="#9bb0cf"/></svg>▲ PU</span>
+          </div>
+        </div>
+        <div class="hint" id="s_pendHint">Pick a result below. Batted balls: tap the field first; <b>K / BB / HBP</b> don't need a location.</div>
 
-  <div class="grp">
-    <div class="gl">Result</div>
-    <div class="selrow c4" style="margin-bottom:8px;">
-      <button class="sb hitc" data-out="1B" onclick="setOut('1B')">1B</button>
-      <button class="sb hitc" data-out="2B" onclick="setOut('2B')">2B</button>
-      <button class="sb hitc" data-out="3B" onclick="setOut('3B')">3B</button>
-      <button class="sb hitc" data-out="HR" onclick="setOut('HR')">HR</button>
+        <div class="grp">
+          <div class="gl">Trajectory (batted balls)</div>
+          <div class="selrow c4">
+            <button class="sb" data-traj="GB" onclick="SprayApp.setTraj('GB')">GB<small>grounder</small></button>
+            <button class="sb" data-traj="LD" onclick="SprayApp.setTraj('LD')">LD<small>liner</small></button>
+            <button class="sb" data-traj="FB" onclick="SprayApp.setTraj('FB')">FB<small>fly ball</small></button>
+            <button class="sb" data-traj="PU" onclick="SprayApp.setTraj('PU')">PU<small>pop up</small></button>
+          </div>
+        </div>
+        <div class="grp">
+          <div class="gl">Result</div>
+          <div class="selrow c4" style="margin-bottom:8px;">
+            <button class="sb hitc" data-out="1B" onclick="SprayApp.setOut('1B')">1B</button>
+            <button class="sb hitc" data-out="2B" onclick="SprayApp.setOut('2B')">2B</button>
+            <button class="sb hitc" data-out="3B" onclick="SprayApp.setOut('3B')">3B</button>
+            <button class="sb hitc" data-out="HR" onclick="SprayApp.setOut('HR')">HR</button>
+          </div>
+          <div class="selrow c5" style="margin-bottom:8px;">
+            <button class="sb" data-out="Out" onclick="SprayApp.setOut('Out')">Out</button>
+            <button class="sb" data-out="FC" onclick="SprayApp.setOut('FC')">FC</button>
+            <button class="sb" data-out="E" onclick="SprayApp.setOut('E')">E</button>
+            <button class="sb" data-out="SAC" onclick="SprayApp.setOut('SAC')">SAC</button>
+            <button class="sb" data-out="SF" onclick="SprayApp.setOut('SF')">SF</button>
+          </div>
+          <div class="selrow c4">
+            <button class="sb" data-out="K" onclick="SprayApp.setOut('K')">K<small>swinging</small></button>
+            <button class="sb" data-out="Kc" onclick="SprayApp.setOut('Kc')">Kc<small>looking</small></button>
+            <button class="sb" data-out="BB" onclick="SprayApp.setOut('BB')">BB<small>walk</small></button>
+            <button class="sb" data-out="HBP" onclick="SprayApp.setOut('HBP')">HBP</button>
+          </div>
+        </div>
+        <div class="notate">
+          <input id="s_notation" type="text" placeholder="Notation (e.g. F8, 6-3, FC 6-4)" autocomplete="off" oninput="SprayApp.onNotationEdit()">
+        </div>
+        <div class="actions">
+          <button class="btn b-log" onclick="SprayApp.logAB()">Log At-Bat</button>
+          <button class="btn b-ghost" onclick="SprayApp.clearPending()">Clear</button>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn b-ghost" style="width:100%;border-color:var(--amber);color:var(--amber);" onclick="SprayApp.undo()">↶ Undo Last At-Bat</button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="labelrow"><span class="label" style="margin-bottom:0;">Scouting summary</span></div>
+        <table>
+          <thead><tr><th class="c">#</th><th>Hitter</th><th class="l">Line</th></tr></thead>
+          <tbody id="s_tbody"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="selrow c5" style="margin-bottom:8px;">
-      <button class="sb" data-out="Out" onclick="setOut('Out')">Out</button>
-      <button class="sb" data-out="FC" onclick="setOut('FC')">FC</button>
-      <button class="sb" data-out="E" onclick="setOut('E')">E</button>
-      <button class="sb" data-out="SAC" onclick="setOut('SAC')">SAC</button>
-      <button class="sb" data-out="SF" onclick="setOut('SF')">SF</button>
+  </section>
+
+  <!-- ===================== NOTES ===================== -->
+  <section class="view" id="tab-notes">
+    <div class="label">Quick notes — add as you see it</div>
+    <div class="quickadd">
+      <input id="n_input" type="text" placeholder="Note as you see it…" autocomplete="off">
+      <button id="n_add">Add</button>
     </div>
-    <div class="selrow c4">
-      <button class="sb" data-out="K" onclick="setOut('K')">K<small>swinging</small></button>
-      <button class="sb" data-out="Kc" onclick="setOut('Kc')">Kc<small>looking</small></button>
-      <button class="sb" data-out="BB" onclick="setOut('BB')">BB<small>walk</small></button>
-      <button class="sb" data-out="HBP" onclick="setOut('HBP')">HBP</button>
-    </div>
-  </div>
+    <div class="nlist" id="n_list"></div>
+    <div class="label">General notes</div>
+    <textarea id="n_general" placeholder="Matchups, adjustments, lineup ideas, anything for the postgame…"></textarea>
+  </section>
 
-  <div class="notate">
-    <input id="notation" type="text" placeholder="Notation (e.g. F8, 6-3, FC 6-4)" autocomplete="off" oninput="onNotationEdit()">
-  </div>
-
-  <div class="actions">
-    <button class="btn b-log" onclick="logAB()">Log At-Bat</button>
-    <button class="btn b-ghost" onclick="clearPending()">Clear</button>
-  </div>
-  <div style="margin-top:10px;">
-    <button class="btn b-ghost" style="width:100%;border-color:var(--amber);color:var(--amber);" onclick="undo()">↶ Undo Last At-Bat</button>
-  </div>
-
-  <div class="labelrow" style="margin-top:18px;"><span class="label">Scouting summary</span></div>
-  <table>
-    <thead><tr><th class="c">#</th><th>Hitter</th><th class="l">Line</th></tr></thead>
-    <tbody id="tbody"></tbody>
-  </table>
-
-  <div class="foot">
-    <button class="btn b-ghost wake" id="wakeBtn" style="border-color:var(--steel);color:#cfe0f7;" onclick="toggleWake()">☀ Keep Screen On</button>
-    <button class="btn b-ghost" style="border-color:var(--steel);color:#cfe0f7;" onclick="exportTxt()">Copy Report</button>
-    <button class="btn b-ghost" style="border-color:var(--red);color:#ff8a6c;" onclick="resetGame()">New Opponent</button>
-  </div>
-  <div class="savenote">Saves to this iPad automatically — works offline. Add to Home Screen for a full-screen icon.</div>
+  <div class="savenote">Saves to this iPad automatically — works offline and survives closing the app. Add to Home Screen for a full-screen icon.</div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="g_toast"></div>
+<div id="report"></div>
 
 <script>
-const SVGNS='http://www.w3.org/2000/svg';
-const HX=200, HY=332;
-const STORE_KEY='cdaSprayChart_v1';
-const AB_OUTCOMES=new Set(['Out','1B','2B','3B','HR','FC','E','K','Kc']);
-const HIT_OUTCOMES=new Set(['1B','2B','3B','HR']);
-const NOLOC=new Set(['K','Kc','BB','HBP']);   // outcomes that need no field location
-const REACH=new Set(['E','FC']);
+"use strict";
 
-let state=null, history=[];
-let pending={loc:null,traj:null,outcome:null,notationDirty:false};
-
-function todayStr(){const d=new Date();return (d.getMonth()+1)+'/'+d.getDate();}
-function uid(){return 'h'+Math.random().toString(36).slice(2,8);}
-function newHitter(order){return {id:uid(),order,name:'',bats:'',abs:[]};}
-function newState(){
-  const lineup=[]; for(let i=1;i<=9;i++) lineup.push(newHitter(i));
-  return {meta:{opponent:'',date:todayStr()}, lineup, currentId:lineup[0].id, showAll:false, autoAdvance:true};
-}
-function curHitter(){ return state.lineup.find(h=>h.id===state.currentId) || null; }
-function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
-
-/* ---------- persistence ---------- */
-function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
-function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-async function save(){const j=JSON.stringify(state);lsSet(STORE_KEY,j);try{if(window.storage){await window.storage.set(STORE_KEY,j,false);}}catch(e){}}
-async function load(){
-  const local=lsGet(STORE_KEY);
-  if(local){try{const s=JSON.parse(local);if(s&&s.lineup)return s;}catch(e){}}
-  try{if(window.storage){const r=await window.storage.get(STORE_KEY);if(r&&r.value){const s=JSON.parse(r.value);if(s&&s.lineup)return s;}}}catch(e){}
-  return null;
-}
-function snapshot(){history.push(JSON.stringify(state));if(history.length>300)history.shift();}
-function undo(){if(!history.length){toast('Nothing to undo');return;}state=JSON.parse(history.pop());clearPending(true);render();save();}
-
-/* ---------- inference + notation ---------- */
-function infer(x,y){
-  const dx=x-HX, dy=HY-y, depth=Math.sqrt(dx*dx+dy*dy);
-  let ang=Math.atan2(dx,dy)*180/Math.PI; if(ang<-50)ang=-50; if(ang>50)ang=50;
-  if(depth<30) return {pos:'2',area:'plate',ang};
-  if(depth<118){
-    let pos;
-    if(ang<=-22)pos='5'; else if(ang<=-7)pos='6';
-    else if(ang<7) pos = depth<55?'1':(ang<0?'6':'4');
-    else if(ang<22)pos='4'; else pos='3';
-    return {pos,area:'IF',ang};
-  }
-  let pos; if(ang<=-16)pos='7'; else if(ang<16)pos='8'; else pos='9';
-  return {pos,area:'OF',ang};
-}
-function notateOut(traj,pos,area){
-  if(traj==='GB'){ if(area==='OF')return pos; if(pos==='3')return '3U'; if(pos==='1')return '1-3'; return pos+'-3'; }
-  if(traj==='LD')return 'L'+pos;
-  if(traj==='FB')return 'F'+pos;
-  if(traj==='PU')return 'P'+pos;
-  return pos;
-}
-function defaultNotation(){
-  const o=pending.outcome; if(!o) return '';
-  const inf = pending.loc ? infer(pending.loc.x,pending.loc.y) : null;
-  const pos=inf?inf.pos:'', area=inf?inf.area:'';
-  switch(o){
-    case '1B':case '2B':case '3B':case 'HR': return o;
-    case 'Out': return inf ? notateOut(pending.traj,pos,area) : (pending.traj?({GB:'GO',LD:'L',FB:'F',PU:'P'})[pending.traj]:'OUT');
-    case 'FC': return 'FC '+(pos||'');
-    case 'E': return 'E'+(pos||'');
-    case 'SAC': return 'SAC';
-    case 'SF': return 'SF'+(pos||'');
-    case 'BB': return 'BB';
-    case 'HBP': return 'HBP';
-    case 'K': return 'K';
-    case 'Kc': return 'Kc';
-    default: return '';
-  }
-}
-function refreshNotation(){ if(!pending.notationDirty){ document.getElementById('notation').value=defaultNotation(); } }
-
-/* ---------- classify ---------- */
-function abClass(o){ if(HIT_OUTCOMES.has(o))return 'hit'; if(REACH.has(o))return 'reach'; if(NOLOC.has(o)&&o!=='HBP'&&o!=='BB')return 'out'; if(o==='BB'||o==='HBP')return 'none'; return 'out'; }
-function hitterLine(h){let ab=0,hh=0;h.abs.forEach(a=>{if(AB_OUTCOMES.has(a.outcome))ab++;if(HIT_OUTCOMES.has(a.outcome))hh++;});return hh+'-'+ab;}
-function tendency(h){
-  const bb=h.abs.filter(a=>a.loc); if(!bb.length) return '';
-  const tc={GB:0,LD:0,FB:0,PU:0}; bb.forEach(a=>{if(a.traj)tc[a.traj]++;});
-  let L=0,C=0,R=0; bb.forEach(a=>{const ang=infer(a.loc.x,a.loc.y).ang; if(ang<-8)L++; else if(ang>8)R++; else C++;});
-  let parts=[];
-  const tj=Object.entries(tc).filter(([k,v])=>v>0).map(([k,v])=>k+':'+v); if(tj.length)parts.push(tj.join(' '));
-  if(h.bats==='R'||h.bats==='L'){
-    const pull=h.bats==='R'?L:R, oppo=h.bats==='R'?R:L;
-    let dir = pull>oppo+1?'pulls':oppo>pull+1?'oppo':'spray';
-    parts.push(dir);
-  } else { parts.push(`L${L} C${C} R${R}`); }
-  return parts.join(' · ');
+/* ===== shared helpers ===== */
+function todayStr(){ const d=new Date(); return (d.getMonth()+1)+'/'+d.getDate(); }
+function esc(s){ return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+let toastT;
+function toast(m){ const t=document.getElementById('g_toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1400); }
+function clipboard(txt){
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>toast('Copied')).catch(()=>fb(txt)); } else fb(txt);
+  function fb(t){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');toast('Copied');}catch(e){toast('Copy not supported');} document.body.removeChild(ta); }
 }
 
-/* ---------- field interaction ---------- */
-function onFieldTap(ev){
-  if(pending.outcome && NOLOC.has(pending.outcome)){ toast('That result needs no location'); return; }
-  const svg=document.getElementById('field');
-  const rect=svg.getBoundingClientRect();
-  const x=(ev.clientX-rect.left)/rect.width*400;
-  const y=(ev.clientY-rect.top)/rect.height*360;
-  pending.loc={x:Math.round(x*10)/10,y:Math.round(y*10)/10};
-  refreshNotation(); renderField(); renderHint();
-}
-function setTraj(t){ pending.traj = pending.traj===t?null:t; markSel(); refreshNotation(); }
-function setOut(o){
-  pending.outcome = pending.outcome===o?null:o;
-  if(pending.outcome && NOLOC.has(pending.outcome)){ pending.loc=null; renderField(); }
-  markSel(); refreshNotation(); renderHint();
-}
-function onNotationEdit(){ pending.notationDirty=true; }
-function clearPending(silent){ pending={loc:null,traj:null,outcome:null,notationDirty:false}; document.getElementById('notation').value=''; markSel(); renderField(); renderHint(); if(!silent){} }
+/* ===================== PITCH MODULE ===================== */
+const PitchApp = (function(){
+  const TARGET_STRIKE=62, TARGET_FPS=60;
+  const STORE_KEY='cdaPitchTracker_v1';
+  const DEFAULT_PITCHERS=['Brumbach','Lilyquist','Johnson','Anderson','Witten','Kotzin','Kreis','Russell','Craig','Everson'];
+  let state=null, history=[];
 
-function logAB(){
-  const h=curHitter(); if(!h){toast('Add a lineup first');return;}
-  if(!pending.outcome){toast('Pick a result');return;}
-  if(!NOLOC.has(pending.outcome) && !pending.loc){ toast('Tap where it was hit'); return; }
-  snapshot();
-  const note=(document.getElementById('notation').value||'').trim() || pending.outcome;
-  h.abs.push({outcome:pending.outcome, traj:NOLOC.has(pending.outcome)?null:pending.traj, notation:note, loc:NOLOC.has(pending.outcome)?null:pending.loc});
-  // auto-advance
-  if(state.autoAdvance){
-    const idx=state.lineup.findIndex(x=>x.id===h.id);
-    state.currentId=state.lineup[(idx+1)%state.lineup.length].id;
-  }
-  clearPending(true);
-  render(); save();
-  toast(note+' logged');
-}
-function deleteAB(hid,i){
-  const h=state.lineup.find(x=>x.id===hid); if(!h)return;
-  const a=h.abs[i]; if(!a)return;
-  if(!confirm('Remove "'+a.notation+'" from '+(h.name||('#'+h.order))+'?')) return;
-  snapshot(); h.abs.splice(i,1); render(); save();
-}
+  function blankP(){ return {pitches:0,strikes:0,balls:0,bf:0,fps:0,ks:0,bbs:0}; }
+  function newState(){ const pitchers={}; DEFAULT_PITCHERS.forEach(n=>pitchers[n]=blankP());
+    return {meta:{opponent:'',date:todayStr()}, pitchers, order:DEFAULT_PITCHERS.slice(), current:null, ab:{balls:0,strikes:0,firstDone:false}}; }
 
-/* ---------- lineup ---------- */
-function selectHitter(id){ state.currentId=id; clearPending(true); render(); save(); }
-function toggleAll(){ state.showAll=!state.showAll; document.getElementById('allBtn').textContent='Show: '+(state.showAll?'Whole Team':'This Hitter'); document.getElementById('allBtn').classList.toggle('on',state.showAll); renderField(); save(); }
-function toggleEditor(){ const e=document.getElementById('editor'); e.classList.toggle('open'); document.getElementById('editBtn').classList.toggle('on',e.classList.contains('open')); if(e.classList.contains('open')) renderEditor(); }
-function renderEditor(){
-  const e=document.getElementById('editor'); e.innerHTML='';
-  state.lineup.forEach(h=>{
-    const row=document.createElement('div'); row.className='erow';
-    row.innerHTML=`<div class="o">${h.order}</div>
-      <input class="enm" placeholder="Name / number" value="${(h.name||'').replace(/"/g,'&quot;')}" data-id="${h.id}">
-      <div class="bats">
-        ${['L','R','S'].map(b=>`<div class="bt${h.bats===b?' on':''}" data-id="${h.id}" data-b="${b}">${b}</div>`).join('')}
-      </div>
-      <button class="del" data-id="${h.id}">×</button>`;
-    e.appendChild(row);
-  });
-  const add=document.createElement('button'); add.className='minibtn'; add.style.marginTop='4px'; add.textContent='+ Add Hitter (sub)';
-  add.onclick=()=>{snapshot(); state.lineup.push(newHitter(state.lineup.length+1)); renderEditor(); render(); save();};
-  e.appendChild(add);
-  const done=document.createElement('button'); done.className='btn b-ghost'; done.style.cssText='width:100%;margin-top:10px;border-color:var(--green);color:var(--hit);'; done.textContent='Done'; done.onclick=toggleEditor;
-  e.appendChild(done);
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  async function save(){ const json=JSON.stringify(state); lsSet(STORE_KEY,json); try{ if(window.storage){ await window.storage.set(STORE_KEY,json,false); } }catch(e){} }
+  async function load(){ const local=lsGet(STORE_KEY);
+    if(local){ try{ const s=JSON.parse(local); if(s&&s.pitchers) return s; }catch(e){} }
+    try{ if(window.storage){ const r=await window.storage.get(STORE_KEY); if(r&&r.value){ const s=JSON.parse(r.value); if(s&&s.pitchers) return s; } } }catch(e){}
+    return null; }
 
-  e.querySelectorAll('input.enm').forEach(inp=>inp.addEventListener('input',ev=>{const h=state.lineup.find(x=>x.id===ev.target.dataset.id);if(h){h.name=ev.target.value;renderChips();renderBatter();renderTable();save();}}));
-  e.querySelectorAll('.bt').forEach(b=>b.addEventListener('click',ev=>{const h=state.lineup.find(x=>x.id===ev.target.dataset.id);if(h){h.bats=(h.bats===ev.target.dataset.b)?'':ev.target.dataset.b;renderEditor();renderBatter();save();}}));
-  e.querySelectorAll('.del').forEach(b=>b.addEventListener('click',ev=>{
-    const id=ev.target.dataset.id; const h=state.lineup.find(x=>x.id===id);
-    if(state.lineup.length<=1){toast('Keep at least one hitter');return;}
-    if(h.abs.length && !confirm('Remove '+(h.name||('#'+h.order))+' and their '+h.abs.length+' logged at-bats?')) return;
+  function snapshot(){ history.push(JSON.stringify(state)); if(history.length>300) history.shift(); }
+  function undo(){ if(!history.length){ toast('Nothing to undo'); return; } state=JSON.parse(history.pop()); render(); save(); }
+
+  function setCurrent(name){ if(state.current===name) return; snapshot(); state.current=name; state.ab={balls:0,strikes:0,firstDone:false}; render(); save(); }
+  function addPitcher(){ const name=(prompt('Add pitcher (last name):')||'').trim(); if(!name) return; snapshot();
+    if(!state.pitchers[name]){ state.pitchers[name]=blankP(); state.order.push(name); }
+    state.current=name; state.ab={balls:0,strikes:0,firstDone:false}; render(); save(); }
+  function addPitch(type){
+    if(!state.current){ toast('Pick a pitcher first'); return; }
     snapshot();
-    state.lineup=state.lineup.filter(x=>x.id!==id);
-    state.lineup.forEach((x,i)=>x.order=i+1);
-    if(state.currentId===id) state.currentId=state.lineup[0].id;
-    renderEditor(); render(); save();
-  }));
-}
+    const p=state.pitchers[state.current];
+    if(!state.ab.firstDone){ state.ab.firstDone=true; p.bf+=1; if(type!=='ball') p.fps+=1; }
+    p.pitches+=1;
+    if(type==='ball'){ p.balls+=1; state.ab.balls+=1; }
+    else { p.strikes+=1;
+      if(type==='strike'){ state.ab.strikes+=1; }
+      else if(type==='foul'){ state.ab.strikes=Math.min(state.ab.strikes+1,2); }
+    }
+    if(type==='inplay'){ endAB(); }
+    else if(state.ab.strikes>=3){ p.ks+=1; endAB(); }
+    else if(state.ab.balls>=4){ p.bbs+=1; endAB(); }
+    render(); save();
+  }
+  function endAB(){ state.ab={balls:0,strikes:0,firstDone:false}; }
+  function nextBatter(){ if(!state.ab.firstDone && state.ab.balls===0 && state.ab.strikes===0){ toast('At-bat already clear'); return; } snapshot(); endAB(); render(); save(); }
 
-/* ---------- render ---------- */
-function markSel(){
-  document.querySelectorAll('.sb[data-traj]').forEach(b=>b.classList.toggle('sel',b.dataset.traj===pending.traj));
-  document.querySelectorAll('.sb[data-out]').forEach(b=>b.classList.toggle('sel',b.dataset.out===pending.outcome));
-}
-function renderChips(){
-  const c=document.getElementById('chips'); c.innerHTML='';
-  state.lineup.forEach(h=>{
-    const b=document.createElement('button'); b.className='chip'+(h.id===state.currentId?' active':'');
-    const nm=h.name||'—';
-    b.innerHTML=`<span class="ord">${h.order}</span> ${nm}<br><span class="ln">${hitterLine(h)}${h.bats?(' · '+h.bats):''}</span>`;
-    b.onclick=()=>selectHitter(h.id); c.appendChild(b);
-  });
-}
-function renderBatter(){
-  const h=curHitter(); const card=document.getElementById('batterCard');
-  if(!h){card.innerHTML='<span class="nm">— no hitter —</span>';return;}
-  let chips='';
-  if(h.abs.length){ h.abs.forEach((a,i)=>{ chips+=`<span class="rc ${abClass(a.outcome)}" onclick="deleteAB('${h.id}',${i})">${a.notation}</span>`; }); }
-  else chips='<span class="rc empty">no at-bats yet</span>';
-  const td=tendency(h);
-  card.innerHTML=`<span class="ln">${hitterLine(h)}</span>
-    <div class="nm">${h.order}. ${h.name||'(tap Edit Lineup)'} ${h.bats?('<em>'+h.bats+'HB</em>'):''}</div>
-    <div class="reschips">${chips}</div>
-    ${td?`<div class="tend">${td}</div>`:''}`;
-}
-function dotShape(a,full){
-  const c=abClass(a.outcome); const color= c==='hit'?'var(--hit)': c==='reach'?'var(--reach)':'var(--out)';
-  const op= full?1:0.32; const x=a.loc.x, y=a.loc.y;
-  let e;
-  if(a.traj==='FB') e=el('circle',{cx:x,cy:y,r:6,fill:'none',stroke:color,'stroke-width':2.4});
-  else if(a.traj==='LD') e=el('rect',{x:x-5,y:y-5,width:10,height:10,fill:color,stroke:'#0b1320','stroke-width':1,transform:`rotate(45 ${x} ${y})`});
-  else if(a.traj==='PU') e=el('path',{d:`M${x},${y-6} L${x+5.2},${y+4} L${x-5.2},${y+4} Z`,fill:color,stroke:'#0b1320','stroke-width':1});
-  else e=el('circle',{cx:x,cy:y,r:5.6,fill:color,stroke:'#0b1320','stroke-width':1});
-  e.setAttribute('opacity',op);
-  return e;
-}
-function renderField(){
-  const layer=document.getElementById('dotLayer'); layer.innerHTML='';
-  const cur=curHitter();
-  if(state.showAll){
-    state.lineup.forEach(h=>{ const full=(h.id===state.currentId); h.abs.forEach(a=>{ if(a.loc) layer.appendChild(dotShape(a,full)); }); });
-  } else if(cur){
-    cur.abs.forEach(a=>{ if(a.loc) layer.appendChild(dotShape(a,true)); });
-  }
-  const pl=document.getElementById('pendLayer'); pl.innerHTML='';
-  if(pending.loc){
-    pl.appendChild(el('circle',{cx:pending.loc.x,cy:pending.loc.y,r:9,fill:'none',stroke:'#ffffff','stroke-width':2,'stroke-dasharray':'3 3'}));
-    pl.appendChild(el('circle',{cx:pending.loc.x,cy:pending.loc.y,r:2.5,fill:'#ffffff'}));
-  }
-}
-function renderHint(){
-  const hint=document.getElementById('pendHint');
-  if(pending.outcome && NOLOC.has(pending.outcome)){ hint.innerHTML='<b>'+pending.outcome+'</b> selected — no location needed. Tap <b>Log At-Bat</b>.'; return; }
-  if(pending.outcome && pending.loc){ hint.innerHTML='Ready: <b>'+(document.getElementById('notation').value||pending.outcome)+'</b>. Tap <b>Log At-Bat</b>.'; return; }
-  if(pending.loc && !pending.outcome){ hint.innerHTML='Location set. Now pick a <b>result</b>.'; return; }
-  hint.innerHTML='Pick a result below. Batted balls: tap the field first; <b>K / BB / HBP</b> don\'t need a location.';
-}
-function renderTable(){
-  const tb=document.getElementById('tbody'); tb.innerHTML='';
-  state.lineup.forEach(h=>{
-    const tr=document.createElement('tr');
-    const res=h.abs.map(a=>a.notation).join(', ');
-    tr.innerHTML=`<td class="o">${h.order}</td>
-      <td class="nm">${h.name||'—'}${h.bats?(' <span style="color:var(--mute);font-size:11px;">'+h.bats+'</span>'):''}<div class="res">${res||'—'}</div></td>
-      <td class="l">${hitterLine(h)}</td>`;
+  function pct(n,d){ return d>0 ? Math.round((n/d)*100) : null; }
+  function fmtPct(v){ return v===null?'—':v+'%'; }
+  function cls(v,target){ if(v===null) return 'neutral'; if(v>=target) return 'good'; if(v>=target-7) return 'warn'; return 'bad'; }
+
+  function render(){
+    const chips=document.getElementById('p_chips'); chips.innerHTML='';
+    state.order.forEach(n=>{ const b=document.createElement('button'); b.className='chip'+(state.current===n?' active':''); b.textContent=n; b.onclick=()=>setCurrent(n); chips.appendChild(b); });
+    const add=document.createElement('button'); add.className='chip add'; add.textContent='+ Add'; add.onclick=addPitcher; chips.appendChild(add);
+
+    document.getElementById('p_sbName').textContent = state.current ? state.current : '— pick a pitcher —';
+    document.getElementById('p_sbAB').textContent = (state.ab.balls+state.ab.strikes)+' P this AB';
+    document.getElementById('p_cBalls').textContent = state.ab.balls;
+    document.getElementById('p_cStrikes').textContent = state.ab.strikes;
+
+    const head=document.getElementById('p_curHead');
+    if(state.current){
+      const p=state.pitchers[state.current]; head.textContent=state.current;
+      const s=pct(p.strikes,p.pitches), f=pct(p.fps,p.bf);
+      const vS=document.getElementById('p_vS'), vF=document.getElementById('p_vF');
+      vS.textContent=fmtPct(s); vS.className='v '+cls(s,TARGET_STRIKE);
+      vF.textContent=fmtPct(f); vF.className='v '+cls(f,TARGET_FPS);
+      document.getElementById('p_vP').textContent=p.pitches;
+      document.getElementById('p_vSB').textContent=p.strikes+' strikes · '+p.balls+' balls';
+      document.getElementById('p_vBF').textContent=p.bf;
+      document.getElementById('p_vKBB').textContent=p.ks+' K · '+p.bbs+' BB';
+    } else {
+      head.textContent='Current pitcher';
+      ['p_vS','p_vF'].forEach(id=>{const e=document.getElementById(id);e.textContent='—';e.className='v neutral';});
+      document.getElementById('p_vP').textContent='0';
+      document.getElementById('p_vSB').textContent='0 strikes · 0 balls';
+      document.getElementById('p_vBF').textContent='0';
+      document.getElementById('p_vKBB').textContent='0 K · 0 BB';
+    }
+
+    const tb=document.getElementById('p_tbody'); tb.innerHTML='';
+    let TP=0,TS=0,TB=0,TBF=0,TFP=0,TK=0,TBB=0;
+    state.order.forEach(n=>{ const p=state.pitchers[n];
+      TP+=p.pitches;TS+=p.strikes;TB+=p.balls;TBF+=p.bf;TFP+=p.fps;TK+=p.ks;TBB+=p.bbs;
+      const s=pct(p.strikes,p.pitches), f=pct(p.fps,p.bf);
+      const tr=document.createElement('tr'); if(p.pitches===0) tr.className='zero';
+      tr.innerHTML=`<td>${n}</td><td>${p.pitches}</td>`+
+        `<td class="${p.pitches?cls(s,TARGET_STRIKE):''}">${fmtPct(s)}</td>`+
+        `<td class="${p.bf?cls(f,TARGET_FPS):''}">${fmtPct(f)}</td>`+
+        `<td>${p.bf}</td><td>${p.ks}</td><td>${p.bbs}</td>`;
+      tb.appendChild(tr);
+    });
+    const ts=pct(TS,TP), tf=pct(TFP,TBF);
+    const tr=document.createElement('tr'); tr.className='team';
+    tr.innerHTML=`<td>Team</td><td>${TP}</td><td>${fmtPct(ts)}</td><td>${fmtPct(tf)}</td><td>${TBF}</td><td>${TK}</td><td>${TBB}</td>`;
     tb.appendChild(tr);
-  });
-}
-function render(){ renderChips(); renderBatter(); renderField(); renderHint(); renderTable(); markSel(); }
+  }
 
-/* ---------- export ---------- */
-function exportTxt(){
-  const m=state.meta; let lines=[];
-  lines.push(`CDA Lumbermen — Opponent Scout${m.opponent?(' vs '+m.opponent):''}${m.date?(' ('+m.date+')'):''}`);
-  state.lineup.forEach(h=>{
-    if(!h.name && !h.abs.length) return;
+  function exportTxt(){
+    let lines=[]; const m=state.meta;
+    lines.push(`CDA Lumbermen — Pitch Tracker${m.opponent?(' vs '+m.opponent):''}${m.date?(' ('+m.date+')'):''}`);
+    lines.push('Pitcher | Pitches | Strk% | FPS% | BF | K | BB');
+    let TP=0,TS=0,TBF=0,TFP=0,TK=0,TBB=0;
+    state.order.forEach(n=>{const p=state.pitchers[n]; if(p.pitches===0) return;
+      TP+=p.pitches;TS+=p.strikes;TBF+=p.bf;TFP+=p.fps;TK+=p.ks;TBB+=p.bbs;
+      lines.push(`${n} | ${p.pitches} | ${fmtPct(pct(p.strikes,p.pitches))} | ${fmtPct(pct(p.fps,p.bf))} | ${p.bf} | ${p.ks} | ${p.bbs}`); });
+    lines.push(`TEAM | ${TP} | ${fmtPct(pct(TS,TP))} | ${fmtPct(pct(TFP,TBF))} | ${TBF} | ${TK} | ${TBB}`);
+    clipboard(lines.join('\n'));
+  }
+
+  function reportHTML(){
+    let TP=0,TS=0,TBF=0,TFP=0,TK=0,TBB=0, rows='';
+    state.order.forEach(n=>{ const p=state.pitchers[n]; if(p.pitches===0) return;
+      TP+=p.pitches;TS+=p.strikes;TBF+=p.bf;TFP+=p.fps;TK+=p.ks;TBB+=p.bbs;
+      rows+=`<tr><td class="l">${esc(n)}</td><td>${p.pitches}</td><td>${fmtPct(pct(p.strikes,p.pitches))}</td><td>${fmtPct(pct(p.fps,p.bf))}</td><td>${p.bf}</td><td>${p.ks}</td><td>${p.bbs}</td></tr>`; });
+    if(!TP) rows='<tr><td class="l" colspan="7">No pitches logged.</td></tr>';
+    else rows+=`<tr><td class="l"><b>TEAM</b></td><td><b>${TP}</b></td><td><b>${fmtPct(pct(TS,TP))}</b></td><td><b>${fmtPct(pct(TFP,TBF))}</b></td><td><b>${TBF}</b></td><td><b>${TK}</b></td><td><b>${TBB}</b></td></tr>`;
+    return `<h2>Pitching</h2><table><thead><tr><th class="l">Pitcher</th><th>P</th><th>Strk%</th><th>FPS%</th><th>BF</th><th>K</th><th>BB</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function getMeta(){ return state ? state.meta : null; }
+  function setMeta(opp,date){ if(!state) return; state.meta.opponent=opp; state.meta.date=date; save(); }
+  function reset(){ state=newState(); history=[]; render(); save(); }
+
+  async function init(){ const loaded=await load(); state=loaded||newState(); if(!state.meta) state.meta={opponent:'',date:todayStr()}; render(); }
+
+  return {init, addPitch, undo, nextBatter, exportTxt, reportHTML, getMeta, setMeta, reset};
+})();
+
+/* ===================== SPRAY MODULE ===================== */
+const SprayApp = (function(){
+  const SVGNS='http://www.w3.org/2000/svg';
+  const HX=200, HY=332;
+  const STORE_KEY='cdaSprayChart_v1';
+  const AB_OUTCOMES=new Set(['Out','1B','2B','3B','HR','FC','E','K','Kc']);
+  const HIT_OUTCOMES=new Set(['1B','2B','3B','HR']);
+  const NOLOC=new Set(['K','Kc','BB','HBP']);
+  const REACH=new Set(['E','FC']);
+
+  let state=null, history=[];
+  let pending={loc:null,traj:null,outcome:null,notationDirty:false};
+
+  function uid(){ return 'h'+Math.random().toString(36).slice(2,8); }
+  function newHitter(order){ return {id:uid(),order,name:'',bats:'',abs:[]}; }
+  function newState(){ const lineup=[]; for(let i=1;i<=9;i++) lineup.push(newHitter(i));
+    return {meta:{opponent:'',date:todayStr()}, lineup, currentId:lineup[0].id, showAll:false, autoAdvance:true}; }
+  function curHitter(){ return state.lineup.find(h=>h.id===state.currentId) || null; }
+  function el(tag,attrs){ const e=document.createElementNS(SVGNS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  async function save(){ const j=JSON.stringify(state); lsSet(STORE_KEY,j); try{ if(window.storage){ await window.storage.set(STORE_KEY,j,false); } }catch(e){} }
+  async function load(){ const local=lsGet(STORE_KEY);
+    if(local){ try{ const s=JSON.parse(local); if(s&&s.lineup) return s; }catch(e){} }
+    try{ if(window.storage){ const r=await window.storage.get(STORE_KEY); if(r&&r.value){ const s=JSON.parse(r.value); if(s&&s.lineup) return s; } } }catch(e){}
+    return null; }
+
+  function snapshot(){ history.push(JSON.stringify(state)); if(history.length>300) history.shift(); }
+  function undo(){ if(!history.length){ toast('Nothing to undo'); return; } state=JSON.parse(history.pop()); clearPending(true); render(); save(); }
+
+  function infer(x,y){
+    const dx=x-HX, dy=HY-y, depth=Math.sqrt(dx*dx+dy*dy);
+    let ang=Math.atan2(dx,dy)*180/Math.PI; if(ang<-50)ang=-50; if(ang>50)ang=50;
+    if(depth<30) return {pos:'2',area:'plate',ang};
+    if(depth<118){ let pos;
+      if(ang<=-22)pos='5'; else if(ang<=-7)pos='6';
+      else if(ang<7) pos = depth<55?'1':(ang<0?'6':'4');
+      else if(ang<22)pos='4'; else pos='3';
+      return {pos,area:'IF',ang}; }
+    let pos; if(ang<=-16)pos='7'; else if(ang<16)pos='8'; else pos='9';
+    return {pos,area:'OF',ang};
+  }
+  function notateOut(traj,pos,area){
+    if(traj==='GB'){ if(area==='OF')return pos; if(pos==='3')return '3U'; if(pos==='1')return '1-3'; return pos+'-3'; }
+    if(traj==='LD')return 'L'+pos; if(traj==='FB')return 'F'+pos; if(traj==='PU')return 'P'+pos; return pos;
+  }
+  function defaultNotation(){
+    const o=pending.outcome; if(!o) return '';
+    const inf = pending.loc ? infer(pending.loc.x,pending.loc.y) : null;
+    const pos=inf?inf.pos:'', area=inf?inf.area:'';
+    switch(o){
+      case '1B':case '2B':case '3B':case 'HR': return o;
+      case 'Out': return inf ? notateOut(pending.traj,pos,area) : (pending.traj?({GB:'GO',LD:'L',FB:'F',PU:'P'})[pending.traj]:'OUT');
+      case 'FC': return 'FC '+(pos||''); case 'E': return 'E'+(pos||'');
+      case 'SAC': return 'SAC'; case 'SF': return 'SF'+(pos||'');
+      case 'BB': return 'BB'; case 'HBP': return 'HBP'; case 'K': return 'K'; case 'Kc': return 'Kc';
+      default: return '';
+    }
+  }
+  function refreshNotation(){ if(!pending.notationDirty){ document.getElementById('s_notation').value=defaultNotation(); } }
+
+  function abClass(o){ if(HIT_OUTCOMES.has(o))return 'hit'; if(REACH.has(o))return 'reach'; if(NOLOC.has(o)&&o!=='HBP'&&o!=='BB')return 'out'; if(o==='BB'||o==='HBP')return 'none'; return 'out'; }
+  function hitterLine(h){ let ab=0,hh=0; h.abs.forEach(a=>{ if(AB_OUTCOMES.has(a.outcome))ab++; if(HIT_OUTCOMES.has(a.outcome))hh++; }); return hh+'-'+ab; }
+  function tendency(h){
+    const bb=h.abs.filter(a=>a.loc); if(!bb.length) return '';
+    const tc={GB:0,LD:0,FB:0,PU:0}; bb.forEach(a=>{ if(a.traj)tc[a.traj]++; });
+    let L=0,C=0,R=0; bb.forEach(a=>{ const ang=infer(a.loc.x,a.loc.y).ang; if(ang<-8)L++; else if(ang>8)R++; else C++; });
+    let parts=[];
+    const tj=Object.entries(tc).filter(([k,v])=>v>0).map(([k,v])=>k+':'+v); if(tj.length)parts.push(tj.join(' '));
+    if(h.bats==='R'||h.bats==='L'){ const pull=h.bats==='R'?L:R, oppo=h.bats==='R'?R:L;
+      let dir = pull>oppo+1?'pulls':oppo>pull+1?'oppo':'spray'; parts.push(dir);
+    } else { parts.push(`L${L} C${C} R${R}`); }
+    return parts.join(' · ');
+  }
+
+  function onFieldTap(ev){
+    if(pending.outcome && NOLOC.has(pending.outcome)){ toast('That result needs no location'); return; }
+    const svg=document.getElementById('s_field'); const rect=svg.getBoundingClientRect();
+    const x=(ev.clientX-rect.left)/rect.width*400; const y=(ev.clientY-rect.top)/rect.height*360;
+    pending.loc={x:Math.round(x*10)/10,y:Math.round(y*10)/10};
+    refreshNotation(); renderField(); renderHint();
+  }
+  function setTraj(t){ pending.traj = pending.traj===t?null:t; markSel(); refreshNotation(); }
+  function setOut(o){ pending.outcome = pending.outcome===o?null:o; if(pending.outcome && NOLOC.has(pending.outcome)){ pending.loc=null; renderField(); } markSel(); refreshNotation(); renderHint(); }
+  function onNotationEdit(){ pending.notationDirty=true; }
+  function clearPending(silent){ pending={loc:null,traj:null,outcome:null,notationDirty:false}; document.getElementById('s_notation').value=''; markSel(); renderField(); renderHint(); }
+
+  function logAB(){
+    const h=curHitter(); if(!h){ toast('Add a lineup first'); return; }
+    if(!pending.outcome){ toast('Pick a result'); return; }
+    if(!NOLOC.has(pending.outcome) && !pending.loc){ toast('Tap where it was hit'); return; }
+    snapshot();
+    const note=(document.getElementById('s_notation').value||'').trim() || pending.outcome;
+    h.abs.push({outcome:pending.outcome, traj:NOLOC.has(pending.outcome)?null:pending.traj, notation:note, loc:NOLOC.has(pending.outcome)?null:pending.loc});
+    if(state.autoAdvance){ const idx=state.lineup.findIndex(x=>x.id===h.id); state.currentId=state.lineup[(idx+1)%state.lineup.length].id; }
+    clearPending(true); render(); save(); toast(note+' logged');
+  }
+  function deleteAB(hid,i){
+    const h=state.lineup.find(x=>x.id===hid); if(!h)return; const a=h.abs[i]; if(!a)return;
+    if(!confirm('Remove "'+a.notation+'" from '+(h.name||('#'+h.order))+'?')) return;
+    snapshot(); h.abs.splice(i,1); render(); save();
+  }
+
+  function selectHitter(id){ state.currentId=id; clearPending(true); render(); save(); }
+  function toggleAll(){ state.showAll=!state.showAll; document.getElementById('s_allBtn').textContent='Show: '+(state.showAll?'Whole Team':'This Hitter'); document.getElementById('s_allBtn').classList.toggle('on',state.showAll); renderField(); save(); }
+  function toggleEditor(){ const e=document.getElementById('s_editor'); e.classList.toggle('open'); document.getElementById('s_editBtn').classList.toggle('on',e.classList.contains('open')); if(e.classList.contains('open')) renderEditor(); }
+  function renderEditor(){
+    const e=document.getElementById('s_editor'); e.innerHTML='';
+    state.lineup.forEach(h=>{
+      const row=document.createElement('div'); row.className='erow';
+      row.innerHTML=`<div class="o">${h.order}</div>
+        <input class="enm" placeholder="Name / number" value="${(h.name||'').replace(/"/g,'&quot;')}" data-id="${h.id}">
+        <div class="bats">${['L','R','S'].map(b=>`<div class="bt${h.bats===b?' on':''}" data-id="${h.id}" data-b="${b}">${b}</div>`).join('')}</div>
+        <button class="del" data-id="${h.id}">×</button>`;
+      e.appendChild(row);
+    });
+    const add=document.createElement('button'); add.className='minibtn'; add.style.marginTop='4px'; add.textContent='+ Add Hitter (sub)';
+    add.onclick=()=>{ snapshot(); state.lineup.push(newHitter(state.lineup.length+1)); renderEditor(); render(); save(); };
+    e.appendChild(add);
+    const done=document.createElement('button'); done.className='btn b-ghost'; done.style.cssText='width:100%;margin-top:10px;border-color:var(--green);color:var(--hit);'; done.textContent='Done'; done.onclick=toggleEditor;
+    e.appendChild(done);
+    e.querySelectorAll('input.enm').forEach(inp=>inp.addEventListener('input',ev=>{const h=state.lineup.find(x=>x.id===ev.target.dataset.id);if(h){h.name=ev.target.value;renderChips();renderBatter();renderTable();save();}}));
+    e.querySelectorAll('.bt').forEach(b=>b.addEventListener('click',ev=>{const h=state.lineup.find(x=>x.id===ev.target.dataset.id);if(h){h.bats=(h.bats===ev.target.dataset.b)?'':ev.target.dataset.b;renderEditor();renderBatter();save();}}));
+    e.querySelectorAll('.del').forEach(b=>b.addEventListener('click',ev=>{
+      const id=ev.target.dataset.id; const h=state.lineup.find(x=>x.id===id);
+      if(state.lineup.length<=1){toast('Keep at least one hitter');return;}
+      if(h.abs.length && !confirm('Remove '+(h.name||('#'+h.order))+' and their '+h.abs.length+' logged at-bats?')) return;
+      snapshot(); state.lineup=state.lineup.filter(x=>x.id!==id); state.lineup.forEach((x,i)=>x.order=i+1);
+      if(state.currentId===id) state.currentId=state.lineup[0].id; renderEditor(); render(); save();
+    }));
+  }
+
+  function markSel(){
+    document.querySelectorAll('#tab-spray .sb[data-traj]').forEach(b=>b.classList.toggle('sel',b.dataset.traj===pending.traj));
+    document.querySelectorAll('#tab-spray .sb[data-out]').forEach(b=>b.classList.toggle('sel',b.dataset.out===pending.outcome));
+  }
+  function renderChips(){
+    const c=document.getElementById('s_chips'); c.innerHTML='';
+    state.lineup.forEach(h=>{ const b=document.createElement('button'); b.className='chip'+(h.id===state.currentId?' active':'');
+      const nm=h.name||'—';
+      b.innerHTML=`<span class="ord">${h.order}</span> ${esc(nm)}<br><span class="ln">${hitterLine(h)}${h.bats?(' · '+h.bats):''}</span>`;
+      b.onclick=()=>selectHitter(h.id); c.appendChild(b); });
+  }
+  function renderBatter(){
+    const h=curHitter(); const card=document.getElementById('s_batterCard');
+    if(!h){ card.innerHTML='<span class="nm">— no hitter —</span>'; return; }
+    let chips='';
+    if(h.abs.length){ h.abs.forEach((a,i)=>{ chips+=`<span class="rc ${abClass(a.outcome)}" onclick="SprayApp.deleteAB('${h.id}',${i})">${esc(a.notation)}</span>`; }); }
+    else chips='<span class="rc empty">no at-bats yet</span>';
     const td=tendency(h);
-    lines.push(`${h.order}. ${h.name||'—'}${h.bats?(' ('+h.bats+')'):''}  ${hitterLine(h)}  [${h.abs.map(a=>a.notation).join(', ')||'—'}]${td?('  '+td):''}`);
+    card.innerHTML=`<span class="ln">${hitterLine(h)}</span>
+      <div class="nm">${h.order}. ${esc(h.name)||'(tap Edit Lineup)'} ${h.bats?('<em>'+h.bats+'HB</em>'):''}</div>
+      <div class="reschips">${chips}</div>
+      ${td?`<div class="tend">${td}</div>`:''}`;
+  }
+  function dotShape(a,full){
+    const c=abClass(a.outcome); const color= c==='hit'?'var(--hit)': c==='reach'?'var(--reach)':'var(--out)';
+    const op= full?1:0.32; const x=a.loc.x, y=a.loc.y; let e;
+    if(a.traj==='FB') e=el('circle',{cx:x,cy:y,r:6,fill:'none',stroke:color,'stroke-width':2.4});
+    else if(a.traj==='LD') e=el('rect',{x:x-5,y:y-5,width:10,height:10,fill:color,stroke:'#0b1320','stroke-width':1,transform:`rotate(45 ${x} ${y})`});
+    else if(a.traj==='PU') e=el('path',{d:`M${x},${y-6} L${x+5.2},${y+4} L${x-5.2},${y+4} Z`,fill:color,stroke:'#0b1320','stroke-width':1});
+    else e=el('circle',{cx:x,cy:y,r:5.6,fill:color,stroke:'#0b1320','stroke-width':1});
+    e.setAttribute('opacity',op); return e;
+  }
+  function renderField(){
+    const layer=document.getElementById('s_dotLayer'); layer.innerHTML=''; const cur=curHitter();
+    if(state.showAll){ state.lineup.forEach(h=>{ const full=(h.id===state.currentId); h.abs.forEach(a=>{ if(a.loc) layer.appendChild(dotShape(a,full)); }); }); }
+    else if(cur){ cur.abs.forEach(a=>{ if(a.loc) layer.appendChild(dotShape(a,true)); }); }
+    const pl=document.getElementById('s_pendLayer'); pl.innerHTML='';
+    if(pending.loc){ pl.appendChild(el('circle',{cx:pending.loc.x,cy:pending.loc.y,r:9,fill:'none',stroke:'#ffffff','stroke-width':2,'stroke-dasharray':'3 3'})); pl.appendChild(el('circle',{cx:pending.loc.x,cy:pending.loc.y,r:2.5,fill:'#ffffff'})); }
+  }
+  function renderHint(){
+    const hint=document.getElementById('s_pendHint');
+    if(pending.outcome && NOLOC.has(pending.outcome)){ hint.innerHTML='<b>'+pending.outcome+'</b> selected — no location needed. Tap <b>Log At-Bat</b>.'; return; }
+    if(pending.outcome && pending.loc){ hint.innerHTML='Ready: <b>'+(document.getElementById('s_notation').value||pending.outcome)+'</b>. Tap <b>Log At-Bat</b>.'; return; }
+    if(pending.loc && !pending.outcome){ hint.innerHTML='Location set. Now pick a <b>result</b>.'; return; }
+    hint.innerHTML='Pick a result below. Batted balls: tap the field first; <b>K / BB / HBP</b> don\'t need a location.';
+  }
+  function renderTable(){
+    const tb=document.getElementById('s_tbody'); tb.innerHTML='';
+    state.lineup.forEach(h=>{ const tr=document.createElement('tr'); const res=h.abs.map(a=>a.notation).join(', ');
+      tr.innerHTML=`<td class="o">${h.order}</td>
+        <td class="nm">${esc(h.name)||'—'}${h.bats?(' <span style="color:var(--mute);font-size:11px;">'+h.bats+'</span>'):''}<div class="res">${esc(res)||'—'}</div></td>
+        <td class="l">${hitterLine(h)}</td>`;
+      tb.appendChild(tr); });
+  }
+  function render(){ renderChips(); renderBatter(); renderField(); renderHint(); renderTable(); markSel(); }
+
+  function exportTxt(){
+    const m=state.meta; let lines=[];
+    lines.push(`CDA Lumbermen — Opponent Scout${m.opponent?(' vs '+m.opponent):''}${m.date?(' ('+m.date+')'):''}`);
+    state.lineup.forEach(h=>{ if(!h.name && !h.abs.length) return; const td=tendency(h);
+      lines.push(`${h.order}. ${h.name||'—'}${h.bats?(' ('+h.bats+')'):''}  ${hitterLine(h)}  [${h.abs.map(a=>a.notation).join(', ')||'—'}]${td?('  '+td):''}`); });
+    clipboard(lines.join('\n'));
+  }
+
+  function reportHTML(){
+    const prevAll=state.showAll; state.showAll=true; renderField();
+    const fieldSVG=document.getElementById('s_field').outerHTML;
+    state.showAll=prevAll; renderField();
+    let rows='';
+    state.lineup.forEach(h=>{ if(!h.name && !h.abs.length) return; const td=tendency(h); const res=h.abs.map(a=>a.notation).join(', ');
+      rows+=`<tr><td>${h.order}</td><td class="l">${esc(h.name)||'—'}${h.bats?(' ('+h.bats+')'):''}${res?('<div style="color:#666;font-size:11px">'+esc(res)+'</div>'):''}</td><td>${hitterLine(h)}</td><td class="l">${esc(td)||'—'}</td></tr>`; });
+    if(!rows) rows='<tr><td class="l" colspan="4">No at-bats logged.</td></tr>';
+    return `<h2>Opponent Spray Scouting</h2><div class="rfield">${fieldSVG}</div>`+
+      `<table><thead><tr><th>#</th><th class="l">Hitter</th><th>Line</th><th class="l">Tendency</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function getMeta(){ return state ? state.meta : null; }
+  function setMeta(opp,date){ if(!state) return; state.meta.opponent=opp; state.meta.date=date; save(); }
+  function reset(){ state=newState(); history=[]; clearPending(true); render(); save(); }
+
+  async function init(){
+    const loaded=await load(); state=loaded||newState(); if(!state.meta) state.meta={opponent:'',date:todayStr()};
+    if(state.showAll){ document.getElementById('s_allBtn').textContent='Show: Whole Team'; document.getElementById('s_allBtn').classList.add('on'); }
+    if(!curHitter() && state.lineup.length) state.currentId=state.lineup[0].id;
+    render();
+  }
+
+  return {init, onFieldTap, setTraj, setOut, onNotationEdit, logAB, clearPending, undo, toggleAll, toggleEditor, deleteAB, exportTxt, reportHTML, getMeta, setMeta, reset};
+})();
+
+/* ===================== NOTES MODULE ===================== */
+const NotesApp = (function(){
+  const STORE_KEY='cdaGameNotes_v1';
+  let state={general:'',entries:[]};
+
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  async function save(){ const j=JSON.stringify(state); lsSet(STORE_KEY,j); try{ if(window.storage){ await window.storage.set(STORE_KEY,j,false); } }catch(e){} }
+  async function load(){ const local=lsGet(STORE_KEY);
+    if(local){ try{ const s=JSON.parse(local); if(s&&Array.isArray(s.entries)) return s; }catch(e){} }
+    try{ if(window.storage){ const r=await window.storage.get(STORE_KEY); if(r&&r.value){ const s=JSON.parse(r.value); if(s&&Array.isArray(s.entries)) return s; } } }catch(e){}
+    return null; }
+
+  function render(){
+    document.getElementById('n_general').value = state.general;
+    const list=document.getElementById('n_list'); list.innerHTML='';
+    if(!state.entries.length){ list.innerHTML='<div class="nempty">No notes yet — jot one above as the game unfolds.</div>'; return; }
+    state.entries.forEach((n,i)=>{ const row=document.createElement('div'); row.className='nentry';
+      row.innerHTML=`<div class="t">${esc(n.ts)}</div><div class="txt"></div><button class="x" aria-label="delete">×</button>`;
+      row.querySelector('.txt').textContent=n.text;
+      row.querySelector('.x').addEventListener('click',()=>{ state.entries.splice(i,1); save(); render(); });
+      list.appendChild(row); });
+  }
+  function add(){ const inp=document.getElementById('n_input'); const v=inp.value.trim(); if(!v) return;
+    const d=new Date(); const ts=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    state.entries.unshift({ts,text:v}); inp.value=''; save(); render(); }
+
+  function reportHTML(){
+    let h='<h2>Game Notes</h2>';
+    if(state.entries.length){ state.entries.slice().reverse().forEach(n=>{ h+=`<div class="note"><b>${esc(n.ts)}</b> — ${esc(n.text)}</div>`; }); }
+    if(state.general.trim()) h+=`<div class="gen">${esc(state.general)}</div>`;
+    if(!state.entries.length && !state.general.trim()) h+='<div class="note">—</div>';
+    return h;
+  }
+  function reset(){ state={general:'',entries:[]}; save(); render(); }
+
+  async function init(){
+    const loaded=await load(); if(loaded) state=loaded;
+    document.getElementById('n_add').addEventListener('click',add);
+    document.getElementById('n_input').addEventListener('keydown',e=>{ if(e.key==='Enter') add(); });
+    document.getElementById('n_general').addEventListener('input',e=>{ state.general=e.target.value; save(); });
+    render();
+  }
+  return {init, reportHTML, reset};
+})();
+
+/* ===================== SHARED CONTROLLER ===================== */
+(function(){
+  // tabs
+  document.querySelectorAll('.tabs button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+    });
   });
-  const txt=lines.join('\n');
-  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>toast('Report copied')).catch(()=>fb(txt));}else fb(txt);
-  function fb(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Report copied');}catch(e){toast('Copy not supported');}document.body.removeChild(ta);}
-}
-function resetGame(){ if(!confirm('Start a new opponent? This clears the lineup and all at-bats.'))return; state=newState(); history=[]; clearPending(true); document.getElementById('opp').value=''; document.getElementById('dt').value=state.meta.date; render(); save(); }
 
-let toastT; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1400);}
+  // shared game line -> both modules
+  const opp=document.getElementById('g_opp'), dt=document.getElementById('g_dt');
+  function pushMeta(){ PitchApp.setMeta(opp.value,dt.value); SprayApp.setMeta(opp.value,dt.value); }
+  opp.addEventListener('input',pushMeta);
+  dt.addEventListener('input',pushMeta);
 
-/* ---------- wake lock ---------- */
-let wakeLock=null,wantWake=false;
-async function acquireWake(){try{if('wakeLock' in navigator){wakeLock=await navigator.wakeLock.request('screen');}}catch(e){}}
-async function toggleWake(){const btn=document.getElementById('wakeBtn');if(!('wakeLock' in navigator)){toast('Not supported here');return;}wantWake=!wantWake;if(wantWake){await acquireWake();btn.classList.add('on');btn.textContent='☀ Screen On';toast('Screen will stay on');}else{try{if(wakeLock)await wakeLock.release();}catch(e){}wakeLock=null;btn.classList.remove('on');btn.textContent='☀ Keep Screen On';}}
-document.addEventListener('visibilitychange',async()=>{if(wantWake&&document.visibilityState==='visible')await acquireWake();});
+  // wake lock (shared)
+  let wakeLock=null, wantWake=false;
+  const wakeBtn=document.getElementById('g_wake');
+  async function acquireWake(){ try{ if('wakeLock' in navigator){ wakeLock=await navigator.wakeLock.request('screen'); } }catch(e){} }
+  async function toggleWake(){
+    if(!('wakeLock' in navigator)){ toast('Not supported here'); return; }
+    wantWake=!wantWake;
+    if(wantWake){ await acquireWake(); wakeBtn.classList.add('on'); wakeBtn.textContent='☀ Screen On'; toast('Screen will stay on'); }
+    else { try{ if(wakeLock) await wakeLock.release(); }catch(e){} wakeLock=null; wakeBtn.classList.remove('on'); wakeBtn.textContent='☀ Keep Screen On'; }
+  }
+  wakeBtn.addEventListener('click',toggleWake);
+  document.addEventListener('visibilitychange',async()=>{ if(wantWake && document.visibilityState==='visible') await acquireWake(); });
+  if(!('wakeLock' in navigator)) wakeBtn.style.display='none';
 
-/* ---------- inputs + boot ---------- */
-document.getElementById('opp').addEventListener('input',e=>{state.meta.opponent=e.target.value;save();});
-document.getElementById('dt').addEventListener('input',e=>{state.meta.date=e.target.value;save();});
-(async function(){
-  const loaded=await load(); state=loaded||newState();
-  if(!state.meta)state.meta={opponent:'',date:todayStr()};
-  document.getElementById('opp').value=state.meta.opponent||'';
-  document.getElementById('dt').value=state.meta.date||todayStr();
-  if(state.showAll){document.getElementById('allBtn').textContent='Show: Whole Team';document.getElementById('allBtn').classList.add('on');}
-  if(!('wakeLock' in navigator))document.getElementById('wakeBtn').style.display='none';
-  if(!curHitter() && state.lineup.length) state.currentId=state.lineup[0].id;
-  render();
+  // PDF
+  document.getElementById('g_pdf').addEventListener('click',()=>{
+    const m = PitchApp.getMeta() || SprayApp.getMeta() || {};
+    const head=`<h1>CDA Lumbermen — Game Report</h1><div class="meta">vs ${esc(m.opponent)||'Opponent'} &nbsp;·&nbsp; ${esc(m.date)||todayStr()}</div>`;
+    document.getElementById('report').innerHTML = head + PitchApp.reportHTML() + SprayApp.reportHTML() + NotesApp.reportHTML();
+    window.print();
+  });
+
+  // New Game (clears live data on all three, keeps nothing of the old game)
+  document.getElementById('g_new').addEventListener('click',()=>{
+    if(!confirm('Start a new game? This clears pitch counts, the spray lineup and at-bats, and game notes.')) return;
+    PitchApp.reset(); SprayApp.reset(); NotesApp.reset();
+    opp.value=''; dt.value=todayStr(); PitchApp.setMeta('',dt.value); SprayApp.setMeta('',dt.value);
+    toast('New game started');
+  });
+
+  // boot
+  (async function(){
+    await PitchApp.init();
+    await SprayApp.init();
+    await NotesApp.init();
+    const m = PitchApp.getMeta() || SprayApp.getMeta() || {opponent:'',date:todayStr()};
+    opp.value = m.opponent||''; dt.value = m.date||todayStr();
+    pushMeta();
+  })();
 })();
 </script>
 </body>
